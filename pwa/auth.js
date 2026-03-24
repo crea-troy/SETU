@@ -3,8 +3,8 @@
  * Replace SUPABASE_URL and SUPABASE_ANON_KEY with your values from:
  * supabase.com → your project → Settings → API
  */
-const SUPABASE_URL      = "https://YOUR_PROJECT_ID.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+const SUPABASE_URL      = "https://gjyaisbifunlwjbhytwr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_rBo0y9n_JsXGImRwl6gezw_0dbZbMMa";
 let supabase=null,currentUser=null;
 async function initSupabase(){
   if(typeof window.supabase==="undefined")return null;
