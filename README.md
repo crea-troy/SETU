@@ -65,7 +65,7 @@ Works on ChatGPT, Claude, Perplexity, Grok, Gemini. SETU button appears automati
 ### Mobile PWA (any phone, no App Store)
 
 ```
-1. Open crea-troy.github.io/setu in your mobile browser
+1. Open crea-troy.github.io/SETU in your mobile browser
 2. iOS:     tap Share → Add to Home Screen
    Android: tap Install prompt
 3. Type or speak your question → optimize → copy → paste
@@ -327,8 +327,8 @@ MIT — free to use, modify, distribute.
 
 ## Links
 
-- **Website:** [crea-troy.github.io/setu](https://crea-troy.github.io/setu)
-- **PWA:** [crea-troy.github.io/setu/pwa](https://crea-troy.github.io/setu/pwa)
+- **Website:** [crea-troy.github.io/SETU](https://crea-troy.github.io/SETU)
+- **PWA:** [crea-troy.github.io/SETU/pwa](https://crea-troy.github.io/SETU/pwa)
 - **Contact:** setu@crea-troy.com
 - **Twitter:** [@crea_troy](https://twitter.com/crea_troy)
 
