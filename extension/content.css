@@ -1,0 +1,41 @@
+/* SETU Extension v5 */
+#setu-btn{position:fixed;bottom:80px;right:20px;z-index:2147483647;background:#0d1117;border:1.5px solid #58a6ff;color:#58a6ff;padding:8px 16px;border-radius:24px;font-family:monospace,sans-serif;font-size:12px;font-weight:500;letter-spacing:1px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:7px;box-shadow:0 4px 20px rgba(88,166,255,0.2);transition:all 0.2s}
+#setu-btn:hover{background:#1a2744;transform:translateY(-2px)}
+.setu-dot{width:7px;height:7px;border-radius:50%;background:#3fb950;animation:sp 2s infinite}
+@keyframes sp{0%,100%{opacity:1}50%{opacity:0.3}}
+#setu-panel{position:fixed;bottom:130px;right:20px;width:400px;max-height:82vh;overflow-y:auto;background:#0d1117;border:1px solid #30363d;border-radius:14px;z-index:2147483646;font-family:monospace,sans-serif;font-size:12px;color:#e6edf3;box-shadow:0 16px 56px rgba(0,0,0,0.7);display:none;animation:su 0.2s ease}
+@keyframes su{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sp-hdr{background:#161b22;border-bottom:1px solid #21262d;padding:12px 16px;display:flex;align-items:center;border-radius:14px 14px 0 0;position:sticky;top:0;z-index:1}
+.sp-logo{font-size:15px;font-weight:700;color:#58a6ff;letter-spacing:2px}
+.sp-sub{font-size:9px;color:#484f58;letter-spacing:1px;margin-top:2px}
+.sp-x{background:none;border:none;color:#484f58;cursor:pointer;font-size:16px;padding:0}
+#sp-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.sp-loading{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;color:#484f58;font-size:11px}
+.sp-dots{display:flex;gap:5px}
+.sp-dots span{width:7px;height:7px;border-radius:50%;background:#58a6ff;animation:sb 1.2s infinite}
+.sp-dots span:nth-child(2){animation-delay:0.2s}.sp-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes sb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+.sp-empty{text-align:center;padding:20px;color:#484f58;font-size:11px;line-height:1.8}
+.sp-cbar{display:flex;align-items:center;gap:6px;background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px 12px}
+.sp-cc{flex:1;text-align:center}.sp-cv{font-size:18px;font-weight:700}
+.sp-cv.r{color:#f85149}.sp-cv.g{color:#3fb950}
+.sp-cl{font-size:9px;color:#484f58;margin-top:2px}.sp-cu{font-size:10px;color:#8b949e;margin-top:1px}.sp-cu.g{color:#3fb950}
+.sp-ca{color:#484f58;font-size:12px;flex-shrink:0}
+.sp-energy{font-size:10px;color:#3fb950;background:rgba(63,185,80,0.06);border:1px solid rgba(63,185,80,0.2);border-radius:6px;padding:6px 10px}
+.sp-lbl{font-size:9px;color:#484f58;text-transform:uppercase;letter-spacing:1.5px}
+.sp-opt{background:#0d2137;border:1px solid #1f4068;border-radius:7px;padding:9px 11px;font-size:11px;color:#e6edf3;line-height:1.7;max-height:160px;overflow-y:auto;cursor:text;outline:none;word-break:break-word;white-space:pre-wrap}
+.sp-opt:focus{border-color:#58a6ff}
+.sp-badges{display:flex;flex-wrap:wrap;gap:5px}
+.sp-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px}
+.sp-badge.bl{background:rgba(88,166,255,0.12);color:#58a6ff}
+.sp-badge.gn{background:rgba(63,185,80,0.12);color:#3fb950}
+.sp-badge.pu{background:rgba(188,140,255,0.12);color:#bc8cff}
+.sp-badge.gy{background:rgba(72,79,88,0.2);color:#8b949e}
+.sp-mem{font-size:10px;color:#bc8cff;background:rgba(188,140,255,0.06);border:1px solid rgba(188,140,255,0.2);border-radius:6px;padding:7px 10px}
+.sp-note{font-size:10px;color:#bc8cff;font-style:italic;line-height:1.5}
+.sp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sp-apply{padding:10px;border-radius:7px;border:1px solid #3fb950;background:rgba(63,185,80,0.1);color:#3fb950;font-family:monospace;font-size:11px;cursor:pointer;font-weight:500}
+.sp-apply:hover{background:rgba(63,185,80,0.2)}
+.sp-keep{padding:10px;border-radius:7px;border:1px solid #30363d;background:transparent;color:#8b949e;font-family:monospace;font-size:11px;cursor:pointer}
+#setu-panel::-webkit-scrollbar{width:3px}
+#setu-panel::-webkit-scrollbar-thumb{background:#21262d;border-radius:2px}

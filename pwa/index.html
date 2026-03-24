@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SETU">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<title>SETU — Bridge between humans and AI</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#0a0f1a;--bg2:#0f1628;--bg3:#151f35;--bg4:#1a2440;--b1:#1e2b45;--b2:#243254;--tx:#e8eef8;--mu:#8a9bbf;--fa:#4a5a7a;--ac:#4f8ef7;--gn:#2dd4a0;--rd:#f05060;--pu:#a78bfa;--ye:#f5a623}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Space Grotesk',system-ui,sans-serif;font-size:14px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono&display=swap');
+button{cursor:pointer;font-family:inherit}textarea,input{font-family:inherit}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* INSTALL BANNER */
+.ib{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:#131d35;border-bottom:1px solid rgba(79,142,247,0.3);padding:10px 16px;align-items:center;gap:10px}
+.ib.show{display:flex}
+.ib-t{font-size:12px;font-weight:600}.ib-s{font-size:10px;color:var(--mu)}
+.ib-install{background:var(--ac);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;margin-left:auto}
+.ib-x{background:none;border:none;color:var(--fa);font-size:16px;padding:4px}
+
+/* SHELL */
+.shell{display:flex;flex-direction:column;min-height:100vh;max-width:560px;margin:0 auto}
+
+/* HEADER */
+header{background:var(--bg2);border-bottom:1px solid var(--b1);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.logo{font-size:17px;font-weight:700;color:var(--ac);letter-spacing:2px;font-family:'Space Mono',monospace}
+.logo-sub{font-size:9px;color:var(--fa);letter-spacing:1px;margin-top:1px}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:7px}
+.hdr-btn{background:var(--bg3);border:1px solid var(--b1);color:var(--mu);padding:5px 11px;border-radius:7px;font-size:11px;font-weight:500}
+.hdr-btn:hover{border-color:var(--ac);color:var(--ac)}
+.icon-btn{background:var(--bg3);border:1px solid var(--b1);color:var(--mu);width:33px;height:33px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{border-color:var(--ac);color:var(--ac)}
+.pro-badge{background:rgba(45,212,160,0.12);color:var(--gn);border:1px solid rgba(45,212,160,0.3);padding:2px 8px;border-radius:10px;font-size:9px;display:none;font-weight:600}
+.sync-badge{font-size:9px;color:var(--ac);display:none}
+.user-name{font-size:11px;color:var(--mu);display:none}
+
+/* SCREENS */
+.screens{flex:1;overflow-y:auto}
+.screen{display:none;padding:16px;flex-direction:column;gap:12px}
+.screen.active{display:flex}
+.screen-hdr{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.back{background:none;border:none;color:var(--ac);font-size:13px;padding:0;font-weight:500}
+.screen-title{font-size:15px;font-weight:600}
+
+/* MAIN SCREEN */
+.model-row{display:flex;flex-direction:column;gap:6px}
+.mlabel{font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.mchips{display:flex;gap:5px;flex-wrap:wrap}
+.mchip{padding:5px 12px;border-radius:20px;border:1px solid var(--b1);background:var(--bg3);color:var(--mu);font-size:11px;font-weight:500;transition:all 0.15s}
+.mchip.on{border-color:var(--ac);color:var(--ac);background:rgba(79,142,247,0.1)}
+
+/* OPTIONS ROW */
+.opts-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.opt-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mu);cursor:pointer}
+.opt-toggle input{width:14px;height:14px;accent-color:var(--ac)}
+.opt-toggle.active{color:var(--ac)}
+
+/* INPUT */
+.input-card{background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:14px}
+.ilabel{font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.lang-badge{background:rgba(167,139,250,0.12);color:var(--pu);border-radius:4px;padding:1px 8px;font-size:9px;display:none;font-weight:600}
+textarea{width:100%;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--tx);padding:12px;font-size:13px;line-height:1.7;resize:none;outline:none;transition:border-color 0.15s}
+textarea:focus{border-color:var(--ac)}
+textarea::placeholder{color:var(--fa);line-height:1.7}
+.iactions{display:flex;gap:8px;margin-top:10px;align-items:center}
+.voice-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--b2);background:var(--bg3);color:var(--mu);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+.voice-btn:hover{border-color:var(--ac);color:var(--ac)}
+.voice-btn.listening{border-color:var(--rd);color:var(--rd);background:rgba(240,80,96,0.1);animation:vp 1s infinite}
+@keyframes vp{0%,100%{box-shadow:0 0 0 0 rgba(240,80,96,0.3)}50%{box-shadow:0 0 0 8px rgba(240,80,96,0)}}
+.opt-btn{flex:1;padding:11px;border-radius:8px;background:var(--ac);border:none;color:#fff;font-size:13px;font-weight:700;letter-spacing:0.3px;transition:opacity 0.15s}
+.opt-btn:disabled{opacity:0.5}
+.opt-btn:not(:disabled):hover{opacity:0.85}
+
+/* RESULT */
+.result-card{background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.result-card.hidden{display:none}
+
+/* QUALITY SCORE */
+.qscore{display:flex;align-items:center;gap:10px;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:500}
+.qs-num{font-size:20px;font-weight:700;font-family:'Space Mono',monospace}
+
+/* COST BAR */
+.cost-bar{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
+.cc{flex:1;text-align:center}
+.cv{font-size:18px;font-weight:700;font-family:'Space Mono',monospace}
+.cv.r{color:var(--rd)}.cv.g{color:var(--gn)}
+.cl{font-size:9px;color:var(--fa);margin-top:2px}
+.cu{font-size:10px;color:var(--mu);margin-top:1px}
+.cu.g{color:var(--gn)}
+.ca{color:var(--fa);font-size:12px;flex-shrink:0}
+
+/* ENERGY */
+.energy-bar{background:rgba(45,212,160,0.06);border:1px solid rgba(45,212,160,0.2);border-radius:8px;padding:7px 12px;font-size:11px;color:var(--gn);display:flex;align-items:center;gap:8px;font-weight:500}
+
+/* RESULT TEXT */
+.rlabel{font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.rtext{background:#0a1e35;border:1px solid #143050;border-radius:8px;padding:12px;font-size:12px;line-height:1.8;color:var(--tx);min-height:80px;outline:none;word-break:break-word;-webkit-user-select:text;user-select:text;white-space:pre-wrap}
+.rtext:focus{border-color:var(--ac)}
+
+.rbadges{display:flex;flex-wrap:wrap;gap:5px}
+.rb{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500}
+.rb.bl{background:rgba(79,142,247,0.12);color:var(--ac)}
+.rb.gn{background:rgba(45,212,160,0.12);color:var(--gn)}
+.rb.pu{background:rgba(167,139,250,0.12);color:var(--pu)}
+.rb.gy{background:rgba(74,90,122,0.2);color:var(--mu)}
+.rb.ye{background:rgba(245,166,35,0.12);color:var(--ye)}
+
+.mem-note{font-size:10px;color:var(--pu);background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:6px;padding:7px 10px;font-weight:500}
+.copy-btn{width:100%;padding:11px;border-radius:8px;border:1px solid var(--gn);background:rgba(45,212,160,0.1);color:var(--gn);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s}
+.copy-btn:hover{background:rgba(45,212,160,0.2)}
+.rnote{font-size:10px;color:var(--pu);font-style:italic;text-align:center}
+
+/* SAVINGS BAR */
+.sv-bar{background:var(--bg2);border:1px solid rgba(45,212,160,0.2);border-radius:12px;padding:12px 14px;display:flex;align-items:center}
+.sv-bar.hidden{display:none}
+.svc{flex:1;text-align:center}
+.svv{font-size:15px;font-weight:700;color:var(--gn);font-family:'Space Mono',monospace}
+.svl{font-size:9px;color:var(--fa);margin-top:2px}
+.svd{width:1px;height:28px;background:var(--b1);flex-shrink:0}
+.share-mini{background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.3);color:var(--gn);padding:5px 12px;border-radius:20px;font-size:10px;margin-left:8px;flex-shrink:0;font-weight:500}
+
+/* STATS SCREEN */
+.impact-card{background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.impact-title{font-size:10px;color:var(--ac);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--b1);border-radius:6px;overflow:hidden}
+.igc{background:var(--bg3);padding:10px 12px}
+.icl{font-size:9px;color:var(--fa);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.icv{font-size:22px;font-weight:700;font-family:'Space Mono',monospace;margin:4px 0 2px}
+.icv.r{color:var(--rd)}.icv.g{color:var(--gn)}
+.ics{font-size:10px;color:var(--fa)}
+.impact-saved{background:rgba(45,212,160,0.08);border:1px solid rgba(45,212,160,0.2);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.isl{font-size:10px;color:var(--mu)}.isv{font-size:20px;font-weight:700;color:var(--gn);font-family:'Space Mono',monospace}
+.share-btn{background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.2);color:var(--gn);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:500}
+.pg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.pi{background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:8px;text-align:center}
+.piv{font-size:13px;font-weight:700;font-family:'Space Mono',monospace}
+.piv.g{color:var(--gn)}.piv.b{color:var(--ac)}.piv.e{color:var(--gn)}
+.pil{font-size:9px;color:var(--fa);margin-top:3px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc{background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:12px}
+.scv{font-size:22px;font-weight:700;font-family:'Space Mono',monospace}
+.scv.g{color:var(--gn)}
+.scl{font-size:9px;color:var(--fa);margin-top:3px}
+.slbl{font-size:9px;color:var(--fa);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.lang-list{display:flex;flex-wrap:wrap;gap:6px}
+.lchip{background:var(--bg3);border:1px solid var(--b1);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--mu);display:flex;align-items:center;gap:5px}
+.lcc{background:var(--ac);color:#fff;border-radius:10px;padding:0px 5px;font-size:9px;font-weight:700}
+.plat-list{display:flex;flex-direction:column;gap:5px}
+.pr{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:8px 12px}
+.prd{width:7px;height:7px;border-radius:50%;background:var(--gn);flex-shrink:0}
+.prn{flex:1;font-size:12px}.prc{font-size:10px;color:var(--fa)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.action-btn{padding:10px;border-radius:8px;border:1px solid var(--b2);background:transparent;color:var(--mu);font-size:11px;font-weight:500;transition:all 0.15s}
+.action-btn:hover{border-color:var(--ac);color:var(--ac)}
+.action-btn.danger:hover{border-color:var(--rd);color:var(--rd)}
+
+/* MEMORY SCREEN */
+.mem-intro{font-size:11px;color:var(--fa);line-height:1.8;background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
+.mem-list{display:flex;flex-direction:column;gap:6px}
+.no-mem{font-size:11px;color:var(--fa);text-align:center;padding:24px 0;line-height:1.8}
+.mi{background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px}
+.miq{font-size:11px;color:var(--tx);line-height:1.5;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mimeta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.mitag{background:var(--bg4);border-radius:3px;padding:1px 6px;font-size:9px;color:var(--fa)}
+.miage{font-size:9px;color:var(--fa);margin-left:auto}
+
+/* IMPORT SCREEN */
+.import-intro{background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.2);border-radius:12px;padding:14px}
+.import-intro-title{font-size:13px;font-weight:600;color:var(--ac);margin-bottom:8px}
+.import-intro p{font-size:11px;color:var(--mu);line-height:1.8}
+.import-checks{margin-top:8px;display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--fa)}
+.drop-zone{border:2px dashed var(--b2);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all 0.2s}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--ac);background:rgba(79,142,247,0.04)}
+.how-card{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:14px}
+.how-title{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:8px}
+.how-steps{font-size:11px;color:var(--mu);line-height:2.2}
+.import-result{display:none;background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:14px}
+.result-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.rg3-item{background:var(--bg3);border-radius:8px;padding:8px;text-align:center}
+.rg3-val{font-size:18px;font-weight:700;font-family:'Space Mono',monospace}
+.rg3-lbl{font-size:9px;color:var(--fa);margin-top:2px}
+.insight-box{background:var(--bg3);border-radius:8px;padding:10px 12px;margin-top:8px}
+.insight-row{display:flex;gap:6px;padding:3px 0;border-bottom:1px solid var(--b1);font-size:11px}
+.insight-row:last-child{border:none}
+.insight-k{color:var(--fa);width:80px;flex-shrink:0}
+.insight-v{color:var(--tx)}
+
+/* UPGRADE CARD */
+.upgrade-card{background:rgba(79,142,247,0.06);border:1px solid rgba(79,142,247,0.2);border-radius:12px;padding:14px;text-align:center;display:none}
+.uc-t{font-size:13px;font-weight:600;color:var(--ac);margin-bottom:6px}
+.uc-f{font-size:11px;color:var(--mu);line-height:1.8;margin-bottom:10px}
+.upgrade-btn{background:var(--ac);color:#fff;border:none;padding:9px 24px;border-radius:8px;font-size:12px;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="ib" id="ib">
+  <div><div class="ib-t">Add SETU to Home Screen</div><div class="ib-s">Works like an app. No App Store.</div></div>
+  <button class="ib-install" onclick="installApp()">Install</button>
+  <button class="ib-x" onclick="dismissInstall()">✕</button>
+</div>
+
+<div class="shell">
+  <header>
+    <div>
+      <div class="logo">SETU</div>
+      <div class="logo-sub">BRIDGE BETWEEN HUMANS AND AI</div>
+    </div>
+    <div class="hdr-r">
+      <span class="sync-badge" id="sync-badge">☁ synced</span>
+      <span class="pro-badge" id="pro-badge">PRO</span>
+      <span class="user-name" id="user-info"></span>
+      <button class="hdr-btn" id="login-btn" onclick="loginWithGoogle()">Sign in</button>
+      <button class="hdr-btn" id="logout-btn" onclick="logout()" style="display:none">Sign out</button>
+      <button class="icon-btn" onclick="showScreen('stats')" title="Stats">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      </button>
+      <button class="icon-btn" onclick="showScreen('memory')" title="Memory">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      </button>
+      <button class="icon-btn" onclick="showScreen('import')" title="Import history">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="screens">
+
+    <!-- MAIN -->
+    <div class="screen active" id="screen-main">
+      <div class="model-row">
+        <div class="mlabel">Optimize for:</div>
+        <div class="mchips">
+          <button class="mchip on" data-m="claude"      onclick="setM(this)">Claude</button>
+          <button class="mchip"    data-m="chatgpt"     onclick="setM(this)">ChatGPT</button>
+          <button class="mchip"    data-m="perplexity"  onclick="setM(this)">Perplexity</button>
+          <button class="mchip"    data-m="gemini"      onclick="setM(this)">Gemini</button>
+          <button class="mchip"    data-m="grok"        onclick="setM(this)">Grok</button>
+        </div>
+      </div>
+
+      <div class="opts-row">
+        <label class="opt-toggle" id="oneshot-lbl">
+          <input type="checkbox" id="oneshot-cb"> ⚡ One Shot
+        </label>
+        <label class="opt-toggle" id="expert-lbl" style="margin-left:8px">
+          <input type="checkbox" id="expert-cb"> 🎓 Expert mode
+        </label>
+      </div>
+
+      <div class="input-card">
+        <div class="ilabel">Your question <span class="lang-badge" id="lang-badge"></span></div>
+        <textarea id="inp" rows="5"
+          placeholder="Type or speak in any language...&#10;&#10;मुझे diabetes के बारे में बताओ&#10;Fix TypeError in Python&#10;How to build a startup&#10;كيف أتعلم البرمجة&#10;Erkläre Machine Learning"
+          oninput="onType()"></textarea>
+        <div class="iactions">
+          <button class="voice-btn" id="vbtn" onclick="toggleVoice()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2H3v2a9 9 0 008 8.94V23h2v-2.06A9 9 0 0021 12v-2h-2z"/></svg>
+          </button>
+          <button class="opt-btn" id="obtn" onclick="runOpt()">⚡ Optimize prompt</button>
+        </div>
+      </div>
+
+      <div class="result-card hidden" id="result-card">
+        <!-- Quality score -->
+        <div class="qscore" id="qscore"></div>
+
+        <!-- Cost comparison -->
+        <div class="cost-bar">
+          <div class="cc"><div class="cv r" id="c-orig">—</div><div class="cl">original tokens</div><div class="cu" id="c-orig-u">—</div></div>
+          <div class="ca">→</div>
+          <div class="cc"><div class="cv" id="c-opt">—</div><div class="cl">optimized</div><div class="cu" id="c-opt-u">—</div></div>
+          <div class="ca">→</div>
+          <div class="cc"><div class="cv g" id="c-saved">—</div><div class="cl">output saved</div><div class="cu g" id="c-saved-u">—</div></div>
+        </div>
+
+        <!-- Energy -->
+        <div class="energy-bar" id="energy-bar">🌱 Calculating energy saved...</div>
+
+        <!-- Optimized prompt -->
+        <div>
+          <div class="rlabel" id="r-label">Optimized for Claude</div>
+          <div class="rtext" id="r-text" contenteditable="true"></div>
+        </div>
+
+        <div class="rbadges" id="r-badges"></div>
+        <div class="mem-note hidden" id="mem-note">🧠 Memory from past conversations added</div>
+
+        <div>
+          <button class="copy-btn" onclick="copyRes()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy &amp; paste into AI
+          </button>
+          <div class="rnote" id="r-note"></div>
+        </div>
+      </div>
+
+      <div class="sv-bar hidden" id="sv-bar">
+        <div class="svc"><div class="svv" id="sv-td">$0.00</div><div class="svl">today</div></div>
+        <div class="svd"></div>
+        <div class="svc"><div class="svv" id="sv-mo">$0.00</div><div class="svl">this month</div></div>
+        <div class="svd"></div>
+        <div class="svc"><div class="svv" id="sv-co2" style="color:var(--gn)">0g</div><div class="svl">CO₂ saved</div></div>
+        <button class="share-mini" onclick="share()">Share</button>
+      </div>
+
+      <div class="upgrade-card" id="up-card">
+        <div class="uc-t">☁ Unlock Cross-Device Sync — Pro</div>
+        <div class="uc-f">Memory syncs across phone + laptop<br>Smart history import from any AI<br>Advanced multilingual patterns</div>
+        <button class="upgrade-btn" onclick="alert('Pro plan coming soon!\nJoin waitlist: setu@crea-troy.com')">Get Pro — $4/month</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="screen" id="screen-stats">
+      <div class="screen-hdr"><button class="back" onclick="showScreen('main')">← Back</button><div class="screen-title">Your impact</div></div>
+      <div class="impact-card">
+        <div class="impact-title">⚡ With vs without SETU</div>
+        <div class="impact-grid">
+          <div class="igc"><div class="icl">Without SETU</div><div class="icv r" id="st-orig">0</div><div class="ics">tokens used</div></div>
+          <div class="igc"><div class="icl">With SETU</div><div class="icv g" id="st-opt">0</div><div class="ics">tokens used</div></div>
+        </div>
+        <div class="impact-saved">
+          <div><div class="isl">Total saved</div><div class="isv" id="st-usd">$0.000</div></div>
+          <button class="share-btn" onclick="share()">Share →</button>
+        </div>
+        <div class="pg">
+          <div class="pi"><div class="piv g" id="st-td-u">$0.00</div><div class="pil">today</div></div>
+          <div class="pi"><div class="piv g" id="st-mo-u">$0.00</div><div class="pil">this month</div></div>
+          <div class="pi"><div class="piv b" id="st-ra">0%</div><div class="pil">saved</div></div>
+        </div>
+      </div>
+      <!-- CO2 card -->
+      <div class="impact-card" style="border-color:rgba(45,212,160,0.2)">
+        <div class="impact-title" style="color:var(--gn)">🌱 Environmental impact</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="pi"><div class="piv e" id="st-co2-tot">0g</div><div class="pil">CO₂ saved total</div></div>
+          <div class="pi"><div class="piv e" id="st-co2-mo">0g</div><div class="pil">this month</div></div>
+          <div class="pi"><div class="piv e" id="st-kwh">0</div><div class="pil">kWh saved</div></div>
+        </div>
+        <div id="co2-eq-text" style="font-size:11px;color:var(--fa);text-align:center;padding:4px 0"></div>
+      </div>
+      <div class="stat-grid">
+        <div class="sc"><div class="scv" id="st-q">0</div><div class="scl">optimized</div></div>
+        <div class="sc"><div class="scv g" id="st-ts">0</div><div class="scl">tokens saved</div></div>
+        <div class="sc"><div class="scv" id="st-m">0</div><div class="scl">memories</div></div>
+        <div class="sc"><div class="scv" id="st-f">0</div><div class="scl">facts learned</div></div>
+      </div>
+      <div class="slbl">Languages used</div>
+      <div class="lang-list" id="lang-list"></div>
+      <div class="slbl">Platforms</div>
+      <div class="plat-list" id="plat-list"></div>
+      <div class="btn-row">
+        <button class="action-btn" onclick="MEMU.exportAll()">⬇ Export data</button>
+        <button class="action-btn danger" onclick="clearAll()">🗑 Clear all</button>
+      </div>
+    </div>
+
+    <!-- MEMORY -->
+    <div class="screen" id="screen-memory">
+      <div class="screen-hdr"><button class="back" onclick="showScreen('main')">← Back</button><div class="screen-title">Memory</div></div>
+      <div class="mem-intro">MEMU remembers across ChatGPT, Claude, Perplexity — and any AI tool you import history from. Stored privately on your device.</div>
+      <div class="mem-list" id="mem-list"><div class="no-mem">No memories yet.<br>Start optimizing or import your chat history!</div></div>
+    </div>
+
+    <!-- IMPORT -->
+    <div class="screen" id="screen-import">
+      <div class="screen-hdr"><button class="back" onclick="showScreen('main')">← Back</button><div class="screen-title">Import history</div></div>
+
+      <div class="import-intro">
+        <div class="import-intro-title">⚡ Know you from day one</div>
+        <p>Import chat history from ANY AI — ChatGPT, Claude, Gemini, Grok, or any other tool that exports JSON.<br><br>SETU reads what topics you discuss, your expertise level, your language preferences, and facts you've shared. Builds your memory instantly.</p>
+        <div class="import-checks">
+          <span>✓ Extracts insights only — not raw copy-paste of conversations</span>
+          <span>✓ Stored privately on your device</span>
+          <span>✓ Nothing sent to any server</span>
+          <span>✓ Works with ChatGPT, Claude, Gemini, Grok, any JSON export</span>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="dz"
+        onclick="document.getElementById('fi').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <div style="font-size:28px;margin-bottom:8px">📁</div>
+        <div style="font-size:13px;color:var(--tx);font-weight:500">Drop conversations.json here</div>
+        <div style="font-size:11px;color:var(--fa);margin-top:4px">or tap to browse · supports any AI export JSON</div>
+        <input type="file" id="fi" accept=".json,.zip" style="display:none" onchange="handleFile(event)">
+      </div>
+
+      <div class="how-card">
+        <div class="how-title">How to export from ChatGPT:</div>
+        <div class="how-steps">1. chatgpt.com → Profile → Settings<br>2. Data Controls → Export Data<br>3. Wait for email → Download ZIP<br>4. Extract ZIP → find conversations.json → upload here</div>
+      </div>
+      <div class="how-card">
+        <div class="how-title">How to export from Claude:</div>
+        <div class="how-steps">1. claude.ai → Profile → Settings<br>2. Privacy → Export conversations<br>3. Download the JSON file → upload here</div>
+      </div>
+      <div class="how-card">
+        <div class="how-title">Any other AI tool:</div>
+        <div class="how-steps">If your AI tool exports chat history as JSON — upload it here. SETU will try to parse it and extract what's useful.</div>
+      </div>
+
+      <div class="import-result" id="ir"></div>
+    </div>
+
+  </div><!-- /screens -->
+</div><!-- /shell -->
+
+<script src="/kova.js"></script>
+<script src="/memu.js"></script>
+<script src="/cost.js"></script>
+<script src="/energy.js"></script>
+<script src="/auth.js"></script>
+<script>
+var M="claude",_rec=null,_listening=false,_dp=null;
+
+// PWA install
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();_dp=e;
+  if(!localStorage.getItem("setu_no_install"))
+    document.getElementById("ib").classList.add("show");
+});
+function installApp(){if(_dp){_dp.prompt();_dp.userChoice.then(dismissInstall);}else alert("Safari: tap Share → Add to Home Screen");}
+function dismissInstall(){localStorage.setItem("setu_no_install","1");document.getElementById("ib").classList.remove("show");}
+
+// Service worker
+if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+
+// Init
+initSupabase().then(()=>{ updateSV(); });
+
+function showScreen(n){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-"+n).classList.add("active");
+  if(n==="stats")loadStats();
+  if(n==="memory")loadMem();
+  if(n==="import")loadImportExisting();
+}
+function setM(b){document.querySelectorAll(".mchip").forEach(c=>c.classList.remove("on"));b.classList.add("on");M=b.dataset.m;}
+
+function onType(){
+  const t=document.getElementById("inp").value;
+  const l=KOVA.detectLang(t);
+  const b=document.getElementById("lang-badge");
+  if(l.code!=="en"&&t.length>3){b.textContent=l.name;b.style.display="inline";}
+  else b.style.display="none";
+}
+
+function toggleVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("Voice needs Chrome browser");return;}
+  const btn=document.getElementById("vbtn");
+  if(_listening){_rec?.stop();return;}
+  _rec=new SR();_rec.continuous=false;_rec.interimResults=true;_rec.lang="";
+  _rec.onstart=()=>{_listening=true;btn.classList.add("listening");};
+  _rec.onresult=e=>{const t=[...e.results].map(r=>r[0].transcript).join("");document.getElementById("inp").value=t;onType();};
+  _rec.onend=()=>{_listening=false;btn.classList.remove("listening");};
+  _rec.onerror=()=>{_listening=false;btn.classList.remove("listening");};
+  _rec.start();
+}
+
+async function runOpt(){
+  const text=document.getElementById("inp").value.trim();
+  if(!text){document.getElementById("inp").focus();return;}
+  const btn=document.getElementById("obtn");
+  btn.textContent="Optimizing...";btn.disabled=true;
+
+  const oneShotMode=document.getElementById("oneshot-cb").checked;
+  const expertOverride=document.getElementById("expert-cb").checked;
+  const lang=KOVA.detectLang(text);
+  const topic=KOVA.detectTopic(text);
+  const ctx=await MEMU.getContext(text,topic,lang.code,120);
+  const res=KOVA.optimize(text,M,ctx,oneShotMode);
+  if(expertOverride&&res.expertise!=="expert"){
+    // Re-optimize with expert context if user toggled it
+    res.expertise="expert";
+  }
+  const cost=COST.preview(res.tokOrig,res.tokOpt,M);
+  const energyInfo=ENERGY.preview(Math.round(250*0.35),M);
+
+  COST.record(M,res.tokOrig,res.tokOpt);
+  ENERGY.record(M,Math.round(250*0.35));
+  await MEMU.save({platform:"setu",query:text,summary:text.slice(0,150),
+    topic:res.topic,lang:res.lang.code,intent:res.intent,
+    expertise:res.expertise,tokSaved:res.saved||0});
+
+  // Quality score display
+  const q=res.quality;
+  const qColor=q.score>=8?"var(--gn)":q.score>=5?"var(--ye)":"var(--rd)";
+  const qBg=q.score>=8?"rgba(45,212,160,0.08)":q.score>=5?"rgba(245,166,35,0.08)":"rgba(240,80,96,0.08)";
+  document.getElementById("qscore").style.cssText=`background:${qBg};border:1px solid ${qColor};border-radius:8px`;
+  document.getElementById("qscore").innerHTML=`<span class="qs-num" style="color:${qColor}">${q.score}/10</span><span style="font-size:11px;color:${qColor};font-weight:500">Question quality: ${q.label}${q.issues.length?" · "+q.issues[0]:""}</span>`;
+
+  // Cost
+  document.getElementById("c-orig").textContent=res.tokOrig;
+  document.getElementById("c-opt").textContent=res.tokOpt;
+  document.getElementById("c-saved").textContent="~-"+Math.round(250*0.35);
+  document.getElementById("c-orig-u").textContent=cost.origUSD;
+  document.getElementById("c-opt-u").textContent=cost.optUSD;
+  document.getElementById("c-saved-u").textContent="saved "+cost.savedUSD;
+
+  // Energy
+  document.getElementById("energy-bar").textContent="🌱 "+energyInfo.message;
+
+  // Result
+  document.getElementById("r-label").textContent="Optimized for "+M.charAt(0).toUpperCase()+M.slice(1)+(oneShotMode?" · One Shot":"")+(expertOverride?" · Expert":"");
+  document.getElementById("r-text").textContent=res.optimized;
+
+  const bl=[];
+  if(res.lang.code!=="en")bl.push({t:res.lang.name,c:"pu"});
+  if(res.contextUsed)bl.push({t:"memory used",c:"pu"});
+  if(res.expertise==="expert")bl.push({t:"expert level",c:"ye"});
+  if(oneShotMode)bl.push({t:"one shot",c:"gn"});
+  if(res.topic!=="general")bl.push({t:res.topic.replace(/_/g," "),c:"bl"});
+  bl.push({t:res.intent,c:"bl"});
+  document.getElementById("r-badges").innerHTML=bl.map(b=>`<span class="rb ${b.c}">${b.t}</span>`).join("");
+
+  const mn=document.getElementById("mem-note");
+  mn.className="mem-note"+(res.contextUsed?"":" hidden");
+  document.getElementById("r-note").textContent=res.note;
+  document.getElementById("result-card").classList.remove("hidden");
+  updateSV();
+  document.getElementById("result-card").scrollIntoView({behavior:"smooth",block:"nearest"});
+
+  const cs=COST.getStats();
+  if(cs.totalQueries>=5&&!isLoggedIn())document.getElementById("up-card").style.display="block";
+
+  btn.textContent="⚡ Optimize prompt";btn.disabled=false;
+}
+
+function copyRes(){
+  const t=document.getElementById("r-text").textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    const b=document.querySelector(".copy-btn");
+    b.textContent="✓ Copied — paste into "+M+"!";
+    setTimeout(()=>{b.innerHTML='<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy & paste into AI';},2500);
+  });
+}
+
+function updateSV(){
+  const cs=COST.getStats(),es=ENERGY.getStats();
+  if(!cs.totalQueries)return;
+  document.getElementById("sv-bar").classList.remove("hidden");
+  document.getElementById("sv-td").textContent=cs.todayUSD;
+  document.getElementById("sv-mo").textContent=cs.monthUSD;
+  document.getElementById("sv-co2").textContent=es.todayFmt||"0g";
+}
+
+async function loadStats(){
+  const cs=COST.getStats(),ms=await MEMU.getStats(),es=ENERGY.getStats();
+  document.getElementById("st-orig").textContent=cs.totalTokOrig.toLocaleString();
+  document.getElementById("st-opt").textContent=cs.totalTokOpt.toLocaleString();
+  document.getElementById("st-usd").textContent=cs.totalUSD;
+  document.getElementById("st-td-u").textContent=cs.todayUSD;
+  document.getElementById("st-mo-u").textContent=cs.monthUSD;
+  document.getElementById("st-ra").textContent=cs.ratio+"%";
+  document.getElementById("st-q").textContent=cs.totalQueries;
+  document.getElementById("st-ts").textContent=cs.totalSaved.toLocaleString();
+  document.getElementById("st-m").textContent=ms.total;
+  document.getElementById("st-f").textContent=ms.facts;
+  // CO2
+  document.getElementById("st-co2-tot").textContent=es.totalFmt||"0g";
+  document.getElementById("st-co2-mo").textContent=es.monthFmt||"0g";
+  document.getElementById("st-kwh").textContent=es.totalKwh||"0";
+  if(es.equivalent) document.getElementById("co2-eq-text").textContent=
+    `${es.equivalent.icon} Like ${es.equivalent.label}`;
+
+  document.getElementById("lang-list").innerHTML=ms.langs.length
+    ?ms.langs.map(([l,c])=>`<span class="lchip">${l}<span class="lcc">${c}</span></span>`).join("")
+    :`<span class="lchip">none yet</span>`;
+  document.getElementById("plat-list").innerHTML=ms.platforms.length
+    ?ms.platforms.map(([p,c])=>`<div class="pr"><div class="prd"></div><div class="prn">${p}</div><div class="prc">${c}</div></div>`).join("")
+    :`<div class="no-mem">No data yet</div>`;
+}
+
+async function loadMem(){
+  const ms=await MEMU.getStats(),el=document.getElementById("mem-list");
+  if(!ms.recent?.length)return;
+  el.innerHTML=ms.recent.map(m=>`<div class="mi"><div class="miq">${esc(m.query||"—")}</div><div class="mimeta"><span class="mitag">${m.platform}</span><span class="mitag">${m.topic}</span><span class="mitag">${m.lang}</span><span class="miage">${MEMU.formatAge(m.ts||Date.now())}</span></div></div>`).join("");
+}
+
+function loadImportExisting(){
+  const mems=JSON.parse(localStorage.getItem("setu_memories_v3")||"[]");
+  if(mems.length>0){
+    const ex=document.getElementById("ir");
+    ex.style.display="block";
+    ex.innerHTML=`<div style="font-size:11px;color:var(--ac);padding:8px">You already have ${mems.length} memories stored. Importing will add more from your AI history.</div>`;
+  }
+}
+
+// ── IMPORT HANDLERS ──────────────────────────────
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById("dz").classList.remove("drag");
+  const file=e.dataTransfer.files[0];
+  if(file)processImport(file);
+}
+function handleFile(e){const file=e.target.files[0];if(file)processImport(file);}
+
+async function processImport(file){
+  const dz=document.getElementById("dz"),ir=document.getElementById("ir");
+  dz.innerHTML=`<div style="font-size:20px;margin-bottom:8px">⏳</div><div style="font-size:12px;color:var(--ac)">Reading ${file.name}...</div><div style="font-size:10px;color:var(--fa);margin-top:4px">Extracting insights (not raw messages)</div>`;
+
+  try{
+    if(file.name.endsWith(".zip")){
+      dz.innerHTML=`<div style="font-size:28px;margin-bottom:8px">📁</div><div style="font-size:13px;color:var(--tx);font-weight:500">Drop conversations.json here</div><div style="font-size:11px;color:var(--fa);margin-top:4px">or tap to browse · supports any AI export JSON</div><input type="file" id="fi" accept=".json,.zip" style="display:none" onchange="handleFile(event)">`;
+      ir.style.display="block";
+      ir.innerHTML=`<div style="color:var(--ye);font-size:12px">ZIP file detected — please extract it first and upload the conversations.json file inside.</div>`;
+      return;
+    }
+
+    const text=await file.text();
+    const json=JSON.parse(text);
+    const parsed=MEMU.smartImport(json,file.name);
+    const result=await MEMU.applyImport(parsed);
+
+    // Reset drop zone
+    dz.innerHTML=`<div style="font-size:28px;margin-bottom:8px">📁</div><div style="font-size:13px;color:var(--tx);font-weight:500">Drop conversations.json here</div><div style="font-size:11px;color:var(--fa);margin-top:4px">or tap to browse · supports any AI export JSON</div><input type="file" id="fi" accept=".json,.zip" style="display:none" onchange="handleFile(event)">`;
+
+    ir.style.display="block";
+    if(!result.ok){
+      ir.innerHTML=`<div style="color:var(--rd);font-size:12px;font-weight:500">❌ Import failed</div><div style="font-size:11px;color:var(--mu);margin-top:6px">${result.error||"Could not read this file format"}</div>`;
+      return;
+    }
+
+    const insights=result.insights||{};
+    const topTopics=(insights.topTopics||[]).slice(0,3).map(([t])=>t.replace(/_/g," ")).join(", ")||"—";
+    const langs=(insights.languages||[]).slice(0,3).map(([l])=>l).join(", ")||"—";
+    const facts=MEMU.loadFacts();
+    const factsHtml=Object.entries(facts).slice(0,4).map(([k,v])=>
+      `<div class="insight-row"><span class="insight-k">${k.replace(/_/g," ")}</span><span class="insight-v">${v.value}</span></div>`
+    ).join("");
+
+    ir.innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:20px">✅</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--gn)">Import successful!</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:2px">From ${result.source} · ${result.totalMessages} messages read</div>
+        </div>
+      </div>
+      <div class="result-grid3">
+        <div class="rg3-item"><div class="rg3-val" style="color:var(--gn)">${result.memoriesAdded}</div><div class="rg3-lbl">memories added</div></div>
+        <div class="rg3-item"><div class="rg3-val" style="color:var(--ac)">${result.factsFound}</div><div class="rg3-lbl">facts learned</div></div>
+        <div class="rg3-item"><div class="rg3-val">${result.totalMessages}</div><div class="rg3-lbl">messages read</div></div>
+      </div>
+      ${topTopics!=="—"?`<div style="font-size:10px;color:var(--fa);margin-bottom:4px">Topics you discuss most:</div><div style="font-size:11px;color:var(--mu);margin-bottom:10px">${topTopics}</div>`:""}
+      ${langs!=="—"?`<div style="font-size:10px;color:var(--fa);margin-bottom:4px">Languages:</div><div style="font-size:11px;color:var(--mu);margin-bottom:10px">${langs} · ${insights.expertise||"intermediate"} level</div>`:""}
+      ${factsHtml?`<div style="font-size:10px;color:var(--fa);margin-bottom:6px">Facts SETU learned about you:</div><div class="insight-box">${factsHtml}</div>`:""}
+      <div style="margin-top:10px;font-size:11px;color:var(--gn);font-weight:500">SETU now knows you. Every prompt will use this context automatically.</div>
+      ${insights.profileSummary?`<div style="margin-top:6px;font-size:10px;color:var(--fa)">${insights.profileSummary}</div>`:""}
+    `;
+  }catch(e){
+    dz.innerHTML=`<div style="font-size:28px;margin-bottom:8px">📁</div><div style="font-size:13px;color:var(--tx);font-weight:500">Drop conversations.json here</div><div style="font-size:11px;color:var(--fa);margin-top:4px">or tap to browse</div><input type="file" id="fi" accept=".json,.zip" style="display:none" onchange="handleFile(event)">`;
+    ir.style.display="block";
+    ir.innerHTML=`<div style="color:var(--rd);font-size:12px">Error: ${e.message}</div>`;
+  }
+}
+
+function share(){
+  const cs=COST.getStats(),es=ENERGY.getStats();
+  const t=`Saved ${cs.monthUSD} on AI tokens + ${es.monthFmt||"0g"} CO₂ this month with SETU!\n\nFree tool: rewrites prompts for ChatGPT, Claude, Perplexity in ANY language. No API key needed.\n\ncrea-troy.github.io/setu`;
+  if(navigator.share)navigator.share({title:"SETU savings",text:t}).catch(()=>{});
+  else navigator.clipboard.writeText(t).then(()=>alert("Copied! Share anywhere."));
+}
+
+function clearAll(){
+  if(confirm("Delete all SETU memory and stats?")){
+    MEMU.clearAll();
+    localStorage.removeItem("setu_cost_v3");
+    localStorage.removeItem("setu_energy_v1");
+    loadStats();loadMem();updateSV();
+    document.getElementById("sv-bar").classList.add("hidden");
+    document.getElementById("result-card").classList.add("hidden");
+  }
+}
+function esc(s){return String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+</script>
+</body>
+</html>
