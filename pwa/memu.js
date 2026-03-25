@@ -16,7 +16,7 @@ const MEMU = (() => {
   const PK       = "setu_profile_v3";
   const UID_KEY  = "setu_uid";
   const MAX      = 500;
-  const API_BASE = "https://your-api.onrender.com"; // ← replace with your deployed URL
+  const API_BASE = "https://setu-api-rk46.onrender.com"; // ← replace with your deployed URL
   const SYNC     = true;
 
   let _sb = null, _uid_override = null, _pro = false;

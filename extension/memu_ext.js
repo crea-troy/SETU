@@ -12,7 +12,7 @@
 
 const MEMU = (() => {
   const MAX        = 300;
-  const API_BASE   = "https://your-api.onrender.com"; // ← replace with your deployed URL
+  const API_BASE   = "https://setu-api-rk46.onrender.com"; // ← replace with your deployed URL
   const SYNC       = true; // set false to disable cloud sync during local development
 
   // ── Anonymous UUID ────────────────────────────────
