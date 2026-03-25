@@ -367,7 +367,14 @@ textarea::placeholder{color:var(--fa);line-height:1.7}
     <!-- MEMORY -->
     <div class="screen" id="screen-memory">
       <div class="screen-hdr"><button class="back" onclick="showScreen('main')">← Back</button><div class="screen-title">Memory</div></div>
-      <div class="mem-intro">MEMU remembers across ChatGPT, Claude, Perplexity — and any AI tool you import history from. Stored privately on your device.</div>
+      <div id="mem-storage-badge" style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;font-size:11px;margin-bottom:4px">
+        <span id="mem-storage-icon">📱</span>
+        <div>
+          <div id="mem-storage-label" style="font-weight:600;color:var(--tx)">Stored on this device</div>
+          <div id="mem-storage-sub" style="color:var(--fa);font-size:10px;margin-top:1px">Free plan · memory lives in your browser · upgrade for cross-device cloud sync</div>
+        </div>
+      </div>
+      <div class="mem-intro">MEMU remembers across ChatGPT, Claude, Perplexity — and any AI tool you import history from.</div>
       <div class="mem-list" id="mem-list"><div class="no-mem">No memories yet.<br>Start optimizing or import your chat history!</div></div>
     </div>
 
@@ -380,9 +387,9 @@ textarea::placeholder{color:var(--fa);line-height:1.7}
         <p>Import chat history from ANY AI — ChatGPT, Claude, Gemini, Grok, or any other tool that exports JSON.<br><br>SETU reads what topics you discuss, your expertise level, your language preferences, and facts you've shared. Builds your memory instantly.</p>
         <div class="import-checks">
           <span>✓ Extracts insights only — not raw copy-paste of conversations</span>
-          <span>✓ Stored privately on your device</span>
-          <span>✓ Nothing sent to any server</span>
           <span>✓ Works with ChatGPT, Claude, Gemini, Grok, any JSON export</span>
+          <span id="import-storage-note">✓ <span id="import-storage-text">Stored privately on your device (free plan)</span></span>
+          <span id="import-cloud-note" style="display:none;color:var(--gn)">✓ Synced to your cloud account automatically</span>
         </div>
       </div>
 
@@ -404,6 +411,14 @@ textarea::placeholder{color:var(--fa);line-height:1.7}
       <div class="how-card">
         <div class="how-title">How to export from Claude:</div>
         <div class="how-steps">1. claude.ai → Profile → Settings<br>2. Privacy → Export conversations<br>3. Download the JSON file → upload here</div>
+      </div>
+      <div class="how-card">
+        <div class="how-title">How to export from Gemini:</div>
+        <div class="how-steps">1. takeout.google.com → Select Gemini Apps<br>2. Export → Download archive<br>3. Extract → find the JSON file → upload here</div>
+      </div>
+      <div class="how-card">
+        <div class="how-title">How to export from Grok:</div>
+        <div class="how-steps">1. x.com → Settings → Privacy and Safety<br>2. Your Account → Download an archive<br>3. Request archive → download → find grok.json → upload here</div>
       </div>
       <div class="how-card">
         <div class="how-title">Any other AI tool:</div>
@@ -585,12 +600,46 @@ async function loadStats(){
 
 async function loadMem(){
   const ms=await MEMU.getStats(),el=document.getElementById("mem-list");
+  // Update storage badge based on plan
+  const isPro=typeof isLoggedIn==="function"&&isLoggedIn()&&
+    document.getElementById("pro-badge")?.style.display!=="none";
+  const storageLabel=document.getElementById("mem-storage-label");
+  const storageSub=document.getElementById("mem-storage-sub");
+  const storageIcon=document.getElementById("mem-storage-icon");
+  if(storageLabel){
+    if(isPro){
+      storageIcon.textContent="☁️";
+      storageLabel.textContent="Synced to cloud";
+      storageLabel.style.color="var(--gn)";
+      storageSub.textContent="Pro plan · memory syncs across all your devices automatically";
+    } else {
+      storageIcon.textContent="📱";
+      storageLabel.textContent="Stored on this device";
+      storageLabel.style.color="var(--tx)";
+      storageSub.textContent="Free plan · memory lives in your browser · upgrade for cross-device cloud sync";
+    }
+  }
   if(!ms.recent?.length)return;
   el.innerHTML=ms.recent.map(m=>`<div class="mi"><div class="miq">${esc(m.query||"—")}</div><div class="mimeta"><span class="mitag">${m.platform}</span><span class="mitag">${m.topic}</span><span class="mitag">${m.lang}</span><span class="miage">${MEMU.formatAge(m.ts||Date.now())}</span></div></div>`).join("");
 }
 
 function loadImportExisting(){
   const mems=JSON.parse(localStorage.getItem("setu_memories_v3")||"[]");
+  const isPro=typeof isLoggedIn==="function"&&isLoggedIn()&&
+    document.getElementById("pro-badge")?.style.display!=="none";
+  // Update import storage note
+  const storageText=document.getElementById("import-storage-text");
+  const cloudNote=document.getElementById("import-cloud-note");
+  if(storageText){
+    if(isPro){
+      storageText.parentElement.style.display="none";
+      if(cloudNote)cloudNote.style.display="";
+    } else {
+      storageText.textContent="Stored privately on your device (free plan)";
+      storageText.parentElement.style.display="";
+      if(cloudNote)cloudNote.style.display="none";
+    }
+  }
   if(mems.length>0){
     const ex=document.getElementById("ir");
     ex.style.display="block";
@@ -659,7 +708,25 @@ async function processImport(file){
       ${factsHtml?`<div style="font-size:10px;color:var(--fa);margin-bottom:6px">Facts SETU learned about you:</div><div class="insight-box">${factsHtml}</div>`:""}
       <div style="margin-top:10px;font-size:11px;color:var(--gn);font-weight:500">SETU now knows you. Every prompt will use this context automatically.</div>
       ${insights.profileSummary?`<div style="margin-top:6px;font-size:10px;color:var(--fa)">${insights.profileSummary}</div>`:""}
+      <div id="import-sync-status" style="margin-top:10px;font-size:11px"></div>
     `;
+
+    // Pro users: push imported memories to cloud so they're available on all devices
+    const isPro=typeof isLoggedIn==="function"&&isLoggedIn()&&
+      document.getElementById("pro-badge")?.style.display!=="none";
+    if(isPro&&result.memoriesAdded>0){
+      const syncEl=document.getElementById("import-sync-status");
+      if(syncEl)syncEl.innerHTML=`<span style="color:var(--ac)">☁️ Syncing ${result.memoriesAdded} memories to cloud…</span>`;
+      try{
+        await MEMU.syncFromCloud(); // pulls + merges any existing cloud memories first
+        if(syncEl)syncEl.innerHTML=`<span style="color:var(--gn)">✓ Synced to cloud — available on all your devices</span>`;
+      }catch{
+        if(syncEl)syncEl.innerHTML=`<span style="color:var(--fa)">Saved locally · will sync when online</span>`;
+      }
+    } else if(!isPro){
+      const syncEl=document.getElementById("import-sync-status");
+      if(syncEl)syncEl.innerHTML=`<span style="color:var(--fa);font-size:10px">📱 Saved on this device · <a href="#" onclick="showScreen('main')" style="color:var(--ac);text-decoration:none">Upgrade to Pro</a> to sync across devices</span>`;
+    }
   }catch(e){
     dz.innerHTML=`<div style="font-size:28px;margin-bottom:8px">📁</div><div style="font-size:13px;color:var(--tx);font-weight:500">Drop conversations.json here</div><div style="font-size:11px;color:var(--fa);margin-top:4px">or tap to browse</div><input type="file" id="fi" accept=".json,.zip" style="display:none" onchange="handleFile(event)">`;
     ir.style.display="block";

@@ -125,6 +125,13 @@ body{width:320px;background:#0a0f1a;color:#e8eef8;font-family:'Space Grotesk',sy
   <div class="plats" id="plats"></div>
 
   <div class="slbl">Recent memory</div>
+  <div id="mem-storage-row" style="display:flex;align-items:center;gap:6px;background:#0f1628;border:1px solid #1e2b45;border-radius:6px;padding:7px 10px;margin-bottom:8px;font-size:10px;color:#8a9bbf">
+    <span id="mem-storage-icon-ext">📱</span>
+    <div>
+      <span id="mem-storage-label-ext" style="color:#e8eef8;font-weight:600">On this device</span>
+      <span id="mem-storage-sub-ext" style="margin-left:4px">· free plan</span>
+    </div>
+  </div>
   <div class="mem-list" id="mems"><div class="no-m">No memories yet.<br>Click SETU on any AI site!</div></div>
 
   <button class="btn import" onclick="openImport()">⬆ Import chat history (any AI)</button>
@@ -193,6 +200,24 @@ async function load(){
   const memEl=document.getElementById("mems");
   if(mems.length){
     memEl.innerHTML=mems.slice(0,6).map(m=>`<div class="mi"><div class="mq">${esc(m.query||"—")}</div><div class="mm"><span class="mt">${m.platform}</span><span class="mt">${m.lang||"en"}</span><span style="margin-left:auto">${ago(m.ts)}</span></div></div>`).join("");
+  }
+
+  // Storage badge — shows whether memory is on-device (free) or cloud (Pro)
+  const uid=data.setu_uid||null;
+  const synced=data.setu_auto_mode!==undefined; // has settings = extension is active
+  const storageIcon=document.getElementById("mem-storage-icon-ext");
+  const storageLabel=document.getElementById("mem-storage-label-ext");
+  const storageSub=document.getElementById("mem-storage-sub-ext");
+  // For now extension is always free-tier local (Pro cloud requires login via PWA)
+  // When user upgrades, auth.js sets a setu_pro flag in chrome.storage
+  if(data.setu_pro){
+    if(storageIcon)storageIcon.textContent="☁️";
+    if(storageLabel){storageLabel.textContent="Cloud synced";storageLabel.style.color="#2dd4a0";}
+    if(storageSub)storageSub.textContent="· Pro plan · available on all devices";
+  } else {
+    if(storageIcon)storageIcon.textContent="📱";
+    if(storageLabel){storageLabel.textContent="On this device";storageLabel.style.color="#e8eef8";}
+    if(storageSub)storageSub.innerHTML=`· free plan · <a href="#" onclick="openImport()" style="color:#4f8ef7;text-decoration:none">upgrade for cloud sync</a>`;
   }
 }
 

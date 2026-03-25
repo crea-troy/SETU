@@ -1,0 +1,13 @@
+# Never commit these
+.DS_Store
+*.log
+node_modules/
+.env
+.env.local
+
+# API server stays private — separate repo
+api/
+
+# Secrets
+auth_keys.json
+supabase_keys.txt
