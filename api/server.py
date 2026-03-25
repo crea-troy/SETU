@@ -35,7 +35,8 @@ def auth(req):
     if key.startswith("sk_setu_"): return key,None,None
     return None,jsonify({"error":"Invalid API key"}),403
 
-@app.route("/"); @app.route("/api/v1/health")
+@app.route("/")
+@app.route("/api/v1/health")
 def health(): return jsonify({"status":"ok","version":"1.0.0","docs":"github.com/crea-troy/setu"})
 
 @app.route("/api/v1/context", methods=["POST"])
