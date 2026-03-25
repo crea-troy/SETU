@@ -871,10 +871,10 @@ footer {
     <a href="#sessions">Sessions</a>
     <a href="#install">Install</a>
     <a href="#pricing">Pricing</a>
-    <a href="https://github.com/crea-troy/setu" target="_blank">GitHub ↗</a>
+    <a href="https://github.com/crea-troy/SETU" target="_blank">GitHub ↗</a>
   </div>
   <div class="nav-r">
-    <a href="https://github.com/crea-troy/setu" target="_blank"><button class="btn-ghost">★ Star</button></a>
+    <a href="https://github.com/crea-troy/SETU" target="_blank"><button class="btn-ghost">★ Star</button></a>
     <a href="#install"><button class="btn-saffron">Get SETU — Free</button></a>
   </div>
 </nav>
@@ -1141,7 +1141,7 @@ footer {
         <div><span class="n">3.</span>Load unpacked → select extension/ folder</div>
         <div><span class="n">4.</span>Open any AI site — SETU button appears</div>
       </div>
-      <a href="https://github.com/crea-troy/setu/releases" target="_blank">
+      <a href="https://github.com/crea-troy/SETU/archive/refs/heads/main.zip" target="_blank">
         <button class="install-btn ib-ink">⬇ Download Extension</button>
       </a>
     </div>
@@ -1151,12 +1151,12 @@ footer {
       <div class="install-title">Mobile PWA</div>
       <div class="install-sub">Works on any phone. Voice input in any language. Offline support. No App Store needed — add to home screen directly.</div>
       <div class="install-steps">
-        <div><span class="n">1.</span>Open crea-troy.github.io/setu in phone browser</div>
+        <div><span class="n">1.</span>Open crea-troy.github.io/SETU/pwa in phone browser</div>
         <div><span class="n">2.</span>Tap Share → Add to Home Screen (iOS)</div>
         <div><span class="n">3.</span>Or tap Install prompt (Android)</div>
         <div><span class="n">4.</span>Type or speak → optimize → copy → paste</div>
       </div>
-      <a href="https://crea-troy.github.io/setu" target="_blank">
+      <a href="https://crea-troy.github.io/SETU/pwa" target="_blank">
         <button class="install-btn ib-saffron">📱 Open Mobile App</button>
       </a>
     </div>
@@ -1164,7 +1164,7 @@ footer {
     <div class="install-card fade-up d2">
       <span class="install-icon">🔌</span>
       <div class="install-title">Developer API</div>
-      <div class="install-sub">Add SETU memory to any app in 3 lines. Free tier: 10,000 requests/month. No credit card. Just get a key and go.</div>
+      <div class="install-sub">Add SETU memory to any app in 3 lines. Free tier: 200 req/day. No credit card. No login needed.</div>
       <div class="install-steps">
         <div><span class="n">1.</span>Get free API key below</div>
         <div><span class="n">2.</span>POST to /api/v1/context before your AI call</div>
@@ -1187,7 +1187,7 @@ footer {
     </div>
     <div class="code-inner">
 <span class="cc"># 1. Get memory context before calling your AI</span>
-ctx = requests.<span class="cf">post</span>(<span class="cs">"https://api.setu.dev/v1/context"</span>,
+ctx = requests.<span class="cf">post</span>(<span class="cs">"https://setu-api-rk46.onrender.com/api/v1/context"</span>,
     headers={<span class="cs">"X-SETU-Key"</span>: <span class="cs">"sk_setu_your_key"</span>},
     json={<span class="cs">"user_id"</span>: user_id, <span class="cs">"query"</span>: message}
 ).<span class="cf">json</span>()[<span class="cs">"context"</span>]
@@ -1196,7 +1196,7 @@ ctx = requests.<span class="cf">post</span>(<span class="cs">"https://api.setu.d
 prompt = ctx + <span class="cs">"\n\nUser: "</span> + message
 
 <span class="cc"># 3. Save after responding (builds memory for next time)</span>
-requests.<span class="cf">post</span>(<span class="cs">"https://api.setu.dev/v1/save"</span>,
+requests.<span class="cf">post</span>(<span class="cs">"https://setu-api-rk46.onrender.com/api/v1/save"</span>,
     headers={<span class="cs">"X-SETU-Key"</span>: <span class="cs">"sk_setu_your_key"</span>},
     json={<span class="cs">"user_id"</span>: user_id, <span class="cs">"query"</span>: message, <span class="cs">"response"</span>: ai_response}
 )
@@ -1308,7 +1308,7 @@ requests.<span class="cf">post</span>(<span class="cs">"https://api.setu.dev/v1/
   <p class="section-sub">No account. No credit card. No API key. Install the extension and use SETU immediately — in your language, on your device, forever.</p>
   <div class="cta-btns">
     <a href="#install"><button class="btn-big primary" style="background:var(--saffron);box-shadow:0 8px 24px rgba(232,137,12,0.3)">⚡ Install Free Extension</button></a>
-    <a href="https://github.com/crea-troy/setu" target="_blank"><button class="btn-big secondary" style="border-color:rgba(253,248,240,0.2);color:rgba(253,248,240,0.6)">★ Star on GitHub</button></a>
+    <a href="https://github.com/crea-troy/SETU" target="_blank"><button class="btn-big secondary" style="border-color:rgba(253,248,240,0.2);color:rgba(253,248,240,0.6)">★ Star on GitHub</button></a>
   </div>
 </div>
 
@@ -1331,10 +1331,10 @@ requests.<span class="cf">post</span>(<span class="cs">"https://api.setu.dev/v1/
     <div>
       <div class="footer-col-title">Open Source</div>
       <div class="footer-links">
-        <a href="https://github.com/crea-troy/setu" target="_blank">GitHub</a>
-        <a href="https://github.com/crea-troy/setu/blob/main/docs/DEPLOY.md" target="_blank">Documentation</a>
-        <a href="https://github.com/crea-troy/setu/blob/main/LICENSE" target="_blank">MIT License</a>
-        <a href="https://github.com/crea-troy/setu/issues" target="_blank">Report issue</a>
+        <a href="https://github.com/crea-troy/SETU" target="_blank">GitHub</a>
+        <a href="https://github.com/crea-troy/SETU/blob/main/docs/DEPLOY.md" target="_blank">Documentation</a>
+        <a href="https://github.com/crea-troy/SETU/blob/main/LICENSE" target="_blank">MIT License</a>
+        <a href="https://github.com/crea-troy/SETU/issues" target="_blank">Report issue</a>
       </div>
     </div>
     <div>
@@ -1490,7 +1490,7 @@ function getKey() {
   const k = "sk_setu_" + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,14);
   const r = document.getElementById("key-result");
   r.style.display = "block";
-  r.innerHTML = `✓ Demo key: <strong>${k}</strong><br><span style="color:var(--ink3);font-size:10px">Deploy SETU API to activate. See docs/DEPLOY.md</span>`;
+  r.innerHTML = `✓ Demo key: <strong>${k}</strong><br><span style="color:var(--ink3);font-size:10px">API offline — try again in a moment</span>`;
 }
 
 function copyCode(btn) {
