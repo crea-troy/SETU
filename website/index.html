@@ -1141,7 +1141,7 @@ footer {
         <div><span class="n">3.</span>Load unpacked → select extension/ folder</div>
         <div><span class="n">4.</span>Open any AI site — SETU button appears</div>
       </div>
-      <a href="https://github.com/crea-troy/setu/releases" target="_blank">
+      <a href="https://github.com/crea-troy/SETU/archive/refs/heads/main.zip" target="_blank">
         <button class="install-btn ib-ink">⬇ Download Extension</button>
       </a>
     </div>
@@ -1151,12 +1151,12 @@ footer {
       <div class="install-title">Mobile PWA</div>
       <div class="install-sub">Works on any phone. Voice input in any language. Offline support. No App Store needed — add to home screen directly.</div>
       <div class="install-steps">
-        <div><span class="n">1.</span>Open crea-troy.github.io/setu in phone browser</div>
+        <div><span class="n">1.</span>Open crea-troy.github.io/SETU/pwa in phone browser</div>
         <div><span class="n">2.</span>Tap Share → Add to Home Screen (iOS)</div>
         <div><span class="n">3.</span>Or tap Install prompt (Android)</div>
         <div><span class="n">4.</span>Type or speak → optimize → copy → paste</div>
       </div>
-      <a href="https://crea-troy.github.io/setu" target="_blank">
+      <a href="https://crea-troy.github.io/SETU/pwa" target="_blank">
         <button class="install-btn ib-saffron">📱 Open Mobile App</button>
       </a>
     </div>
@@ -1164,7 +1164,7 @@ footer {
     <div class="install-card fade-up d2">
       <span class="install-icon">🔌</span>
       <div class="install-title">Developer API</div>
-      <div class="install-sub">Add SETU memory to any app in 3 lines. Free tier: 10,000 requests/month. No credit card. Just get a key and go.</div>
+      <div class="install-sub">Add SETU memory to any app in 3 lines. Free tier: 200 requests/day. No credit card. No login needed.</div>
       <div class="install-steps">
         <div><span class="n">1.</span>Get free API key below</div>
         <div><span class="n">2.</span>POST to /api/v1/context before your AI call</div>
@@ -1490,7 +1490,7 @@ function getKey() {
   const k = "sk_setu_" + Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,14);
   const r = document.getElementById("key-result");
   r.style.display = "block";
-  r.innerHTML = `✓ Demo key: <strong>${k}</strong><br><span style="color:var(--ink3);font-size:10px">Deploy SETU API to activate. See docs/DEPLOY.md</span>`;
+  r.innerHTML = `✓ Demo key: <strong>${k}</strong><br><span style="color:var(--ink3);font-size:10px">API offline — try again in a moment</span>`;
 }
 
 function copyCode(btn) {
